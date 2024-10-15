@@ -23,7 +23,7 @@ sqlalchemy = "^2.0.31"
 pydantic-settings = "^2.3.4"
 alembic = "^1.13.2"
 asyncpg = "^0.29.0"
-uvloop = "^0.20.0"
+uvloop = "^0.21.0"
 aiogram-i18n = "^1.4"
 fluent-runtime = "^0.4.0"
 nc-py-api = { git = "https://github.com/cloud-py-api/nc_py_api.git" }
