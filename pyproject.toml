@@ -30,7 +30,7 @@ nc-py-api = { git = "https://github.com/cloud-py-api/nc_py_api.git" }
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.10.1"
-ruff = "^0.6.0"
+ruff = "^0.7.0"
 pre-commit = "^3.7.1"
 
 [tool.ruff]
