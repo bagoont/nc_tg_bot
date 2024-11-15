@@ -22,7 +22,7 @@ redis = "^5.0.7"
 sqlalchemy = "^2.0.31"
 pydantic-settings = "^2.3.4"
 alembic = "^1.13.2"
-asyncpg = "^0.29.0"
+asyncpg = "^0.30.0"
 uvloop = "^0.21.0"
 aiogram-i18n = "^1.4"
 fluent-runtime = "^0.4.0"
@@ -30,7 +30,7 @@ nc-py-api = { git = "https://github.com/cloud-py-api/nc_py_api.git" }
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.10.1"
-ruff = "^0.6.0"
+ruff = "^0.7.0"
 pre-commit = "^3.7.1"
 
 [tool.ruff]
