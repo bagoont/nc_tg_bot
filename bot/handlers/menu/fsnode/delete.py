@@ -8,7 +8,7 @@ from aiogram.types import CallbackQuery, Message
 from aiogram_i18n import I18nContext
 from nc_py_api import AsyncNextcloud
 
-from bot.handlers._core import get_fsnode_msg
+from bot.handlers.core import get_fsnode_msg
 from bot.keyboards import fsnode_delete_board
 from bot.keyboards.callback_data_factories import FsNodeMenuData
 from bot.nextcloud import FsNodeService, PrevFsNodeService

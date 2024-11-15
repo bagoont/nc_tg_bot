@@ -20,16 +20,16 @@ from bot.core.config import settings
 from bot.db import session_maker
 
 session = None
-if settings.tg.api_server:
+if settings.TG_API_SERVER:
     loggers.dispatcher.info("Bot works with self-hosted API server.")
-    if settings.tg.local_mode:
+    if settings.TG_LOCAL_MODE:
         loggers.dispatcher.info("Work with API in local mode.")
     session = AiohttpSession(
-        api=TelegramAPIServer.from_base(settings.tg.api_server, is_local=settings.tg.local_mode),
+        api=TelegramAPIServer.from_base(settings.TG_API_SERVER, is_local=settings.TG_LOCAL_MODE),
     )
 
 bot = Bot(
-    token=settings.tg.token,
+    token=settings.TG_TOKEN,
     default=DefaultBotProperties(parse_mode=ParseMode.HTML),
     session=session,
 )
@@ -37,14 +37,12 @@ bot = Bot(
 _storage = (
     RedisStorage(
         redis=Redis(
-            db=settings.redis.db,
-            host=settings.redis.host,
-            password=settings.redis.password,
-            username=settings.redis.user,
-            port=settings.redis.port,
+            db=settings.redis.DB,
+            host=settings.redis.HOSTNAME,
+            password=settings.redis.PASSWORD,
+            username=settings.redis.USERNAME,
+            port=settings.redis.PORT,
         ),
-        state_ttl=settings.redis.state_ttl,
-        data_ttl=settings.redis.data_ttl,
     )
     if settings.redis
     else MemoryStorage()

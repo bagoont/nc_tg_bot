@@ -42,7 +42,7 @@ class _FsNodeBaseBoard(_FsNodeAbstractBoard, ABC):
         self,
         fsnodes: list[FsNode],
         page: int = 0,
-        page_size: int = settings.tg.page_size,
+        page_size: int = settings.TG_PAGE_SIZE,
         **kwargs: Any,
     ) -> None:
         self.builder = InlineKeyboardBuilder()

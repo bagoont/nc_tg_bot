@@ -19,7 +19,7 @@ fsnode-delete =
     Are you sure you want to delete the file <b>{ $name }</b>? 💣
 
     <b>This action cannot be undone.</b>
-fsnode-delete-alert = The file "{ $name }" was successfully deleted. 💀
+fsnode-delete-alert = The file was successfully deleted. 💀
 
 ## New file.
 fsnode-new = Choose how you want to create a new file inside the <b>{ $name }</b> folder. 🔨

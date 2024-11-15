@@ -1,11 +1,10 @@
 """Fsnode menu handler."""
 
-
 from aiogram.types import Message
 from aiogram_i18n import I18nContext
 from nc_py_api import AsyncNextcloud
 
-from bot.handlers._core import get_fsnode_msg
+from bot.handlers.core import get_fsnode_msg
 from bot.nextcloud import RootFsNodeService
 from bot.nextcloud.exceptions import FsNodeNotFoundError
 

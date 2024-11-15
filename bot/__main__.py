@@ -19,17 +19,17 @@ async def main() -> None:
         await webhook_run(
             dp,
             bot,
-            settings.webhook.base_url,
-            settings.webhook.path,
-            settings.webhook.host,
-            settings.webhook.port,
-            settings.webhook.secret,
+            settings.webhook.BASEURL,
+            settings.webhook.PATH,
+            settings.webhook.HOST,
+            settings.webhook.PORT,
+            settings.webhook.SECRET,
         )
     else:
         await dp.start_polling(bot)
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.getLevelName(settings.logging))
+    logging.basicConfig(level=logging.getLevelName(settings.LOGGING_LEVEL))
 
     uvloop.run(main())

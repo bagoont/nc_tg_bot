@@ -7,7 +7,7 @@ from aiogram_i18n import I18nContext
 from nc_py_api import AsyncNextcloud
 
 from bot.core import settings
-from bot.handlers._core import get_human_readable_bytes
+from bot.handlers.core import get_human_readable_bytes
 from bot.keyboards.callback_data_factories import FsNodeMenuData
 from bot.nextcloud import FsNodeService
 from bot.nextcloud.exceptions import FsNodeNotFoundError
@@ -39,11 +39,11 @@ async def download(
     if srv.fsnode.info.size == 0:
         return await query.answer(text=i18n.get("fsnode-empty"))
 
-    if srv.fsnode.info.size > settings.tg.max_download_size:
+    if srv.fsnode.info.size > settings.TG_UPLOAD_SIZE:
         text = i18n.get(
             "fsnode-size-limit",
             size=get_human_readable_bytes(srv.fsnode.info.size),
-            size_limit=get_human_readable_bytes(settings.tg.max_download_size),
+            size_limit=get_human_readable_bytes(settings.TG_UPLOAD_SIZE),
         )
         return await query.answer(text=text)
 

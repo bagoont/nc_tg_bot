@@ -4,7 +4,7 @@ from aiogram.types import Message
 from aiogram_i18n import I18nContext
 from nc_py_api import AsyncNextcloud
 
-from bot.handlers._core import get_trashbin_msg
+from bot.handlers.core import get_trashbin_msg
 from bot.nextcloud import TrashbinService
 
 

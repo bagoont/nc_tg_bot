@@ -15,27 +15,21 @@ from bot.handlers import routers
 from bot.middlewares import LocaleManager, QueryMsgMD
 
 
-async def _set_menu_button(bot: Bot) -> None:
-    if settings.nc.overwrite and settings.nc.overwrite.protocol == "https":
-        url = f"{settings.nc.overwrite.protocol}://{settings.nc.overwrite.host}:{settings.nc.overwrite.port}"
-    elif settings.nc.protocol == "https":
-        url = f"{settings.nc.protocol}://{settings.nc.host}:{settings.nc.port}"
-    else:
-        return
-
-    await bot.set_chat_menu_button(
-        menu_button=MenuButtonWebApp(
-            type=MenuButtonType.WEB_APP,
-            text="Nextcloud",
-            web_app=WebAppInfo(
-                url=url,
+async def set_menu_button(bot: Bot) -> None:
+    if settings.nc.BASEURL.startswith("https"):
+        await bot.set_chat_menu_button(
+            menu_button=MenuButtonWebApp(
+                type=MenuButtonType.WEB_APP,
+                text="Nextcloud",
+                web_app=WebAppInfo(
+                    url=settings.nc.BASEURL,
+                ),
             ),
-        ),
-    )
+        )
 
 
-async def _set_bot_menu(bot: Bot) -> None:
-    await _set_menu_button(bot)
+async def set_bot_menu(bot: Bot) -> None:
+    await set_menu_button(bot)
 
     commands = [
         BotCommand(command="help", description="Get message with help text"),
@@ -54,7 +48,7 @@ async def on_startup(dispatcher: Dispatcher, bot: Bot) -> None:
     """
     loggers.dispatcher.info("Bot starting...")
 
-    await _set_bot_menu(bot)
+    await set_bot_menu(bot)
 
     for router in routers:
         dispatcher.include_router(router())
@@ -80,7 +74,7 @@ async def on_shutdown(dispatcher: Dispatcher, bot: Bot) -> None:
     await dispatcher.storage.close()
     await dispatcher.fsm.storage.close()
 
-    await bot.delete_webhook(drop_pending_updates=settings.tg.drop_pending_updates)
+    await bot.delete_webhook(drop_pending_updates=settings.TG_DROP_PENDING_UPDATES)
     await bot.session.close()
 
     loggers.dispatcher.info("Bot stopped.")

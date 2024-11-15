@@ -7,133 +7,63 @@ configuration, webhook settings, Nextcloud server details, and Telegram bot cred
 
 from typing import Self
 
-from pydantic import BaseModel, field_validator, model_validator
+from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from sqlalchemy.engine import URL
 
-MAX_TG_FILE_SIZE = 2**31
-DEFAULT_SIZE_LIMIT = 20 * 2**20
+SQLITE_URL = "sqlite+aiosqlite:///./database.db"
+
+MAX_TG_BOT_FILE_SIZE = 50 * 2**20
 MIN_CHUNK_SIZE = 5 * 2**20
-MAX_CHUNK_SIZE = MAX_TG_FILE_SIZE
+MAX_CHUNK_SIZE = 2**31
 
 
-class Database(BaseModel):
-    """Configuration for connecting to a database.
-
-    :param host: The hostname of the database server.
-    :param user: The username for database authentication.
-    :param name: The name of the database.
-    :param password: The password for database authentication.
-    :param port: The port number on which the database server listens, defaults to 5432.
-    :param driver: The database driver to use, defaults to "asyncpg".
-    :param database_system: The type of database system, defaults to "postgresql".
-    """
-
-    host: str
-    user: str
-    db: str
-    password: str
-    port: int = 5432
-    driver: str = "asyncpg"
-    database_system: str = "postgresql"
-
-    @property
-    def url(self) -> str:
-        """Construct and return the SQLAlchemy URL based on the database settings."""
-        return URL.create(
-            drivername=f"{self.database_system}+{self.driver}",
-            username=self.user,
-            database=self.db,
-            password=self.password,
-            port=self.port,
-            host=self.host,
-        ).render_as_string(hide_password=False)
-
-
-class Redis(BaseModel):
-    """Configuration for connecting to a Redis cache.
-
-    Redis connection settings are optional and fall back to in-memory storage if not provided.
-
-    :param host: Hostname of the Redis server.
-    :param db: Database number within Redis to connect to, defaults to 1.
-    :param port: Port number on which the Redis server listens, defaults to 6379.
-    :param user: Uername for Redis authentication, defaults to None.
-    :param password: Password for Redis authentication, defaults to None.
-    :param state_ttl: Time-to-live for state data in Redis, defaults to None.
-    :param data_ttl: Time-to-live for operational data in Redis, defaults to None.
-    """
-
-    host: str
-    db: int = 1
-    port: int = 6379
-    user: str | None = None
-    password: str | None = None
-    state_ttl: int | None = None
-    data_ttl: int | None = None
-
-
-class Webhook(BaseModel):
+class Webhook(BaseSettings):
     """Configuration for a webhook endpoint.
 
     Webhook settings are optional and are used when the bot is configured
     to receive updates via a webhook.
 
-    :param host: The host of webhook.
-    :param port: The port number on which the webhook server listens.
-    :param base_url: The base URL for the webhook endpoint.
-    :param path: The path under which the webhook endpoint is accessible.
-    :param secret: A secret token used for webhook verification, defaults to None.
+    :param WEBHOOK_BASE_URL: The base URL for the webhook endpoint.
+    :param WEBHOOK_HOST: The host of webhook.
+    :param WEBHOOK_PORT: The port number on which the webhook server listens.
+    :param WEBHOOK_PATH: The path under which the webhook endpoint is accessible.
+    :param WEBHOOK_SECRET: A secret token used for webhook verification, defaults to None.
     """
 
-    host: str
-    port: int
-    base_url: str
-    path: str
-    secret: str | None = None
+    BASEURL: str
+    HOST: str
+    PORT: int
+    PATH: str
+    SECRET: str | None = None
 
 
-class Overwrite(BaseModel):
-    """Overwrite settings for Nextcloud server.
-
-    It is used to overwrite the default url, for example, if the default url is not accessible
-    from outside, and the user needs access to the link for authorization,
-    than default url will be overwritten by this.
-
-    :param protocol: Protocol used to communicate with the Nextcloud server.
-    :param host: Hostname of the Nextcloud server.
-    :param port: Port number on which the Nextcloud server listens.
-    """
-
-    protocol: str
-    host: str
-    port: int
-
-
-class Nextcloud(BaseModel):
+class Nextcloud(BaseSettings):
     """Configuration to communicate with a Nextcloud server.
 
-    :param protocol: Protocol used to communicate with the Nextcloud server, defaults to "https".
-    :param host: Hostname of the Nextcloud server.
-    :param port: Port number on which the Nextcloud server listens, defaults to 80.
-    :param chunksize: Maximum size of file chunks for uploads, defaults to MIN_CHUNK_SIZE.
-    :param overwrite: Overwrite settings for Nextcloud server, defaults to None.
+    :param NC_BASE_URL:
+    :param NC_SCHEME: Protocol used to communicate with the Nextcloud server, defaults to "https".
+    :param NC_HOST: Hostname of the Nextcloud server.
+    :param NC_PORT: Port number on which the Nextcloud server listens, defaults to 80.
+    :param NC_FILE_SIZE:
+    :param NC_CHUNK_SIZE: Maximum size of file chunks for uploads, defaults to MIN_CHUNK_SIZE.
     """
 
-    protocol: str = "https"
-    host: str
-    port: int = 443
-    chunksize: int = MIN_CHUNK_SIZE
-    overwrite: Overwrite | None = None
+    SCHEME: str = "https"
+    HOST: str
+    PORT: int = 443
+    FILESIZE: int = 5 * 2**30
+    CHUNKSIZE: int = MIN_CHUNK_SIZE
+    BASEURL: str = ""
 
-    @property
-    def url(self) -> str:
-        """Constructs and returns the URL for connecting to the Nextcloud server."""
-        return f"{self.protocol}://{self.host}:{self.port}"
+    @model_validator(mode="after")
+    def validate_baseurl(self) -> Self:
+        if self.BASEURL == "":
+            self.BASEURL = f"{self.SCHEME}://{self.HOST}:{self.PORT}"
+        return self
 
-    @field_validator("chunksize")
+    @field_validator("CHUNKSIZE")
     @classmethod
-    def check_chunksize(cls, v: int) -> int:
+    def validate_chunksize(cls, v: int) -> int:
         """Validates the chunk size against minimum and maximum limits."""
         if MIN_CHUNK_SIZE > v > MAX_CHUNK_SIZE:
             msg = f"The size of chunks must be between {MIN_CHUNK_SIZE} and {MAX_CHUNK_SIZE}."
@@ -141,71 +71,88 @@ class Nextcloud(BaseModel):
         return v
 
 
-class Telegram(BaseModel):
-    """Configuration specific to the Telegram bot, such as the bot token and upload limits.
+class Database(BaseSettings):
+    """Configuration for connecting to a database.
 
-    :param token: Token used to authenticate the bot with the Telegram API.
-    :param page_size: Page size for pagination for Telegram API, defaults to 8.
-    :param max_upload_size: Maximum size of a file that can be uploaded, defaults to
-        DEFAULT_SIZE_LIMIT.
-    :param max_download_size: Maximum size of a file that can be downloaded, defaults to
-        DEFAULT_SIZE_LIMIT.
-    :param drop_pending_updates: Whether to drop pending updates on bot restart, defaults to True.
-    :param api_server: The URL of the Telegram API server, defaults to None.
-    :param local_mode: Use local requests if True, defaults to False.
+    :param DB_USERNAME: The username for database authentication.
+    :param DB_PASSWORD: The password for database authentication.
+    :param DB_HOSTNAME: The hostname of the database server.
+    :param DB_PORT: The port number on which the database server listens, defaults to 5432.
+    :param DB_DB: The name of the database.
+    :param DB_DRIVER: The database driver to use, defaults to "asyncpg".
+    :param DB_SYSTEM: The type of database system, defaults to "postgresql".
     """
 
-    token: str
-    page_size: int = 8
-    max_upload_size: int = DEFAULT_SIZE_LIMIT
-    max_download_size: int = DEFAULT_SIZE_LIMIT
-    drop_pending_updates: bool = True
-    api_server: str | None = None
-    local_mode: bool = False
+    USERNAME: str
+    PASSWORD: str
+    HOSTNAME: str
+    PORT: int = 5432
+    DB: str
+    DRIVER: str = "asyncpg"
+    SYSTEM: str = "postgresql"
 
-    @field_validator("max_upload_size")
-    @classmethod
-    def validate_max_upload_size(cls, v: int) -> int:
-        """Validates the max upload size against maximum limit."""
-        if v > MAX_TG_FILE_SIZE:
-            msg = f"The max size must be less than {MAX_TG_FILE_SIZE}."
-            raise ValueError(msg)
-        return v
 
-    @model_validator(mode="after")
-    def validate_local_mode(self) -> Self:
-        """Checks if the `local_mode` field is True and if the `api_server` field is None."""
-        if self.local_mode and self.api_server is None:
-            msg = "Local mode requires API server to be set."
-            raise ValueError(msg)
-        return self
+class Redis(BaseSettings):
+    """Configuration for connecting to a Redis cache.
+
+    Redis connection settings are optional and fall back to in-memory storage if not provided.
+
+    :param REDIS_USERNAME: Uername for Redis authentication, defaults to None.
+    :param REDIS_PASSWORD: Password for Redis authentication, defaults to None.
+    :param REDIS_HOSTNAME: Hostname of the Redis server.
+    :param REDIS_PORT: Port number on which the Redis server listens, defaults to 6379.
+    :param REDIS_DB: Database number within Redis to connect to, defaults to 1.
+    """
+
+    USERNAME: str
+    PASSWORD: str
+    DB: str
+    HOSTNAME: str
+    PORT: int = 6379
 
 
 class Settings(BaseSettings):
     """Configuration in a single object.
 
     :param model_config: Configuration options for Pydantic settings.
-    :param appname: Name of the application, defaults to "Nextcloud Telegram Bot".
-    :param logging: Logging level, defaults to "INFO".
-    :param telegram: An instance of :class:`Telegram` containing Telegram-specific settings.
-    :param nextcloud: An instance of :class:`Nextcloud` containing Nextcloud-specific settings.
-    :param db: Containing database connection settings.
-    :param redis: Containing Redis connection settings, defaults to None.
-    :param webhook: Containing webhook settings, defaults to None.
+    :param APP_NAME: Name of the application, defaults to "Nextcloud Telegram Bot".
+    :param LOGGING_LEVEL: Logging level, defaults to "INFO".
+    :param TG_TOKEN: Token used to authenticate the bot with the Telegram API.
+    :param TG_PAGE_SIZE: Page size for pagination for Telegram API, defaults to 8.
+    :param TG_UPLOAD_SIZE: Maximum size of a file that can be uploaded, defaults to
+        MAX_TG_BOT_FILE_SIZE.
+    :param TG_DROP_PENDING_UPDATES: Whether to drop pending updates on bot restart, defaults to True.
+    :param TG_API_SERVER: The URL of the Telegram API server, defaults to None.
+    :param TG_LOCAL_MODE: Use local requests if True, defaults to False.
     """
 
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
-        env_nested_delimiter="__",
+        env_nested_delimiter="_",
     )
-    appname: str = "Nextcloud Telegram Bot"
-    logging: str = "INFO"
-    tg: Telegram
+    APP_NAME: str = "Nextcloud Telegram Bot"
+    LOGGING_LEVEL: str = "INFO"
+
+    TG_TOKEN: str
+    TG_PAGE_SIZE: int = 8
+    TG_UPLOAD_SIZE: int = MAX_TG_BOT_FILE_SIZE
+    TG_DROP_PENDING_UPDATES: bool = True
+    TG_API_SERVER: str | None = None
+    TG_LOCAL_MODE: bool = False
+
     nc: Nextcloud
-    db: Database
+    db: Database | None = None
     redis: Redis | None = None
     webhook: Webhook | None = None
+
+    @model_validator(mode="after")
+    def validate_local_mode(self) -> Self:
+        """Checks if the `local_mode` field is True and if the `api_server` field is None."""
+        if self.TG_LOCAL_MODE and self.TG_API_SERVER is None:
+            msg = "Local mode requires API server to be set."
+            raise ValueError(msg)
+        return self
 
 
 settings = Settings()
