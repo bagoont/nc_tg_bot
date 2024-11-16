@@ -18,7 +18,7 @@ trashbin-cleanup-start = Are you sure you want to empty the trash bin?
 
 ## Actions with a file inside the trash bin.
 trashbin-fsnode = Choose an action
-trashbin-delete-button = ❌ Delete 
+trashbin-delete-button = ❌ Delete
 trashbin-restore-button = 🔃 Restore
 trashbin-delete-alert = File deleted
 trashbin-restore-alert = File restored

@@ -1,3 +1,5 @@
+"""Main and useful functions for handlers."""
+
 from typing import Any, TypeVar
 
 from aiogram.types import InlineKeyboardMarkup
@@ -48,6 +50,7 @@ def get_fsnode_msg(
     attached_fsnodes: list[FsNode],
     **kwargs: Any,
 ) -> tuple[str, InlineKeyboardMarkup]:
+    """Returns contenr for fsnode message."""
     text = i18n.get(
         "fsnode",
         type="dir" if fsnode.is_dir else "file",
@@ -73,6 +76,7 @@ def get_trashbin_msg(
     trashbin_size: int,
     **kwargs: Any,
 ) -> tuple[str, InlineKeyboardMarkup | None]:
+    """Returns contenr for trashbin message."""
     if trashbin == []:
         text = i18n.get("trashbin-empty")
         return text, None
@@ -81,9 +85,7 @@ def get_trashbin_msg(
         [
             i18n.get(
                 "trashbin-item",
-                path=fsnode.info.trashbin_original_location
-                if fsnode.info.trashbin_original_location
-                else "/",
+                path=fsnode.info.trashbin_original_location if fsnode.info.trashbin_original_location else "/",
             )
             for fsnode in fsnodes_on_page
         ],
@@ -107,15 +109,13 @@ def get_search_msg(
     fsnodes: list[FsNode],
     **kwargs: Any,
 ) -> tuple[str, InlineKeyboardMarkup | None]:
+    """Returns contenr for search message."""
     if fsnodes == []:
         text = i18n.get("search-empty")
         return text, None
     fsnodes_on_page = get_page_items(fsnodes, **kwargs)
     fsnodes_text = "\n".join(
-        [
-            i18n.get("search-item", path=fsnode.user_path if fsnode.user_path else "/")
-            for fsnode in fsnodes_on_page
-        ],
+        [i18n.get("search-item", path=fsnode.user_path if fsnode.user_path else "/") for fsnode in fsnodes_on_page],
     )
     text = f"{i18n.get('search', count=len(fsnodes), query=query)}\n{fsnodes_text}"
     reply_markup = SearchBoard(

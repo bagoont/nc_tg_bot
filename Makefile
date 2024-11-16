@@ -3,7 +3,7 @@ project_dir := .
 .PHONY: lint
 lint:
 	ruff check $(project_dir)
-	mypy $(project_dir) --strict
+	pyright $(project_dir)
 
 .PHONY: format
 format:

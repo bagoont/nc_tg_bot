@@ -16,6 +16,7 @@ from bot.middlewares import LocaleManager, QueryMsgMD
 
 
 async def set_menu_button(bot: Bot) -> None:
+    """Set menu button in Telegram if base url of Nextclout use secure scheme."""
     if settings.nc.BASEURL.startswith("https"):
         await bot.set_chat_menu_button(
             menu_button=MenuButtonWebApp(
@@ -29,6 +30,7 @@ async def set_menu_button(bot: Bot) -> None:
 
 
 async def set_bot_menu(bot: Bot) -> None:
+    """Set avliable commands in Telegram."""
     await set_menu_button(bot)
 
     commands = [

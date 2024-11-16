@@ -57,6 +57,7 @@ class Nextcloud(BaseSettings):
 
     @model_validator(mode="after")
     def validate_baseurl(self) -> Self:
+        """Validate and set the BASEURL attribute of the model."""
         if self.BASEURL == "":
             self.BASEURL = f"{self.SCHEME}://{self.HOST}:{self.PORT}"
         return self

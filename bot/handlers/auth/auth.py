@@ -18,6 +18,7 @@ AUTH_TIMEOUT_IN_MIN = AUTH_TIMEOUT // 60
 
 
 def replace_with_base_url(url: str) -> str:
+    """Replce url for authentification with base url."""
     parsed_url = urlparse(url)
     parsed_base_url = urlparse(settings.nc.BASEURL)
 
@@ -29,6 +30,7 @@ def replace_with_base_url(url: str) -> str:
         scheme=parsed_base_url.scheme,
         netloc=netloc,
     ).geturl()
+
 
 async def auth(
     message: Message,

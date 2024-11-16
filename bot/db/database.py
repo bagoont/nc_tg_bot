@@ -1,10 +1,9 @@
 """Creates an asynchronous SQLAlchemy engine and session maker."""
 
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.engine import URL
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-from bot.core import settings, SQLITE_URL
-
+from bot.core import SQLITE_URL, settings
 
 db_url = (
     URL.create(
