@@ -1,5 +1,6 @@
+"""Main and useful functions for handlers."""
+
 from typing import Any, TypeVar
-from urllib.parse import urlparse
 
 from aiogram.types import InlineKeyboardMarkup
 from aiogram_i18n import I18nContext
@@ -10,16 +11,6 @@ from bot.keyboards import FsNodeMenuBoard, SearchBoard, TrashbinBoard
 from bot.utils import MIME_SYMBOLS
 
 R = TypeVar("R")
-
-
-def overwrite_url(url: str) -> str:
-    if not settings.nc.overwrite:
-        return url
-    parsed_url = urlparse(url)
-    return parsed_url._replace(
-        scheme=settings.nc.overwrite.protocol,
-        netloc=f"{settings.nc.overwrite.host}:{settings.nc.overwrite.port}",
-    ).geturl()
 
 
 def get_human_readable_bytes(num: float, suffix: str = "B") -> str:
@@ -39,13 +30,13 @@ def get_human_readable_bytes(num: float, suffix: str = "B") -> str:
 def get_page_items(
     item_list: list[R],
     page: int = 0,
-    page_size: int = settings.tg.page_size,
+    page_size: int = settings.TG_PAGE_SIZE,
 ) -> list[R]:
     """Return a slice of the input list `item_list` based on the provided `page` and `page_size`.
 
     :param item_list: The list from which to extract the items.
     :param page: The page number to retrieve. Defaults to 0.
-    :param page_size: The number of items per page, defaults to `settings.tg.page_size`.
+    :param page_size: The number of items per page, defaults to `settings.TG_PAGE_SIZE`.
     :return: A list containing the items on the specified page.
     """
     start_index = page * page_size
@@ -59,6 +50,7 @@ def get_fsnode_msg(
     attached_fsnodes: list[FsNode],
     **kwargs: Any,
 ) -> tuple[str, InlineKeyboardMarkup]:
+    """Returns contenr for fsnode message."""
     text = i18n.get(
         "fsnode",
         type="dir" if fsnode.is_dir else "file",
@@ -84,6 +76,7 @@ def get_trashbin_msg(
     trashbin_size: int,
     **kwargs: Any,
 ) -> tuple[str, InlineKeyboardMarkup | None]:
+    """Returns contenr for trashbin message."""
     if trashbin == []:
         text = i18n.get("trashbin-empty")
         return text, None
@@ -92,9 +85,7 @@ def get_trashbin_msg(
         [
             i18n.get(
                 "trashbin-item",
-                path=fsnode.info.trashbin_original_location
-                if fsnode.info.trashbin_original_location
-                else "/",
+                path=fsnode.info.trashbin_original_location if fsnode.info.trashbin_original_location else "/",
             )
             for fsnode in fsnodes_on_page
         ],
@@ -118,15 +109,13 @@ def get_search_msg(
     fsnodes: list[FsNode],
     **kwargs: Any,
 ) -> tuple[str, InlineKeyboardMarkup | None]:
+    """Returns contenr for search message."""
     if fsnodes == []:
         text = i18n.get("search-empty")
         return text, None
     fsnodes_on_page = get_page_items(fsnodes, **kwargs)
     fsnodes_text = "\n".join(
-        [
-            i18n.get("search-item", path=fsnode.user_path if fsnode.user_path else "/")
-            for fsnode in fsnodes_on_page
-        ],
+        [i18n.get("search-item", path=fsnode.user_path if fsnode.user_path else "/") for fsnode in fsnodes_on_page],
     )
     text = f"{i18n.get('search', count=len(fsnodes), query=query)}\n{fsnodes_text}"
     reply_markup = SearchBoard(

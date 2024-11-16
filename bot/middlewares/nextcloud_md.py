@@ -38,8 +38,9 @@ class NextcloudMD(BaseMiddleware):
             msg = "Telegram event object must have 'from_user' attribute."
             raise AttributeError(msg)
         user = await uow.users.get_by_id(event.from_user.id)
+        url = f"{settings.nc.SCHEME}://{settings.nc.HOST}:{settings.nc.PORT}"
         data["nc"] = AsyncNextcloud(
-            nextcloud_url=settings.nc.url,
+            nextcloud_url=url,
             nc_auth_user=user.nc_login if user else None,
             nc_auth_pass=user.nc_app_password if user else None,
         )

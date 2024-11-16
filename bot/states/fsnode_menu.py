@@ -1,4 +1,5 @@
 """FsNode menu states group."""
+
 from aiogram.fsm.state import State, StatesGroup
 
 

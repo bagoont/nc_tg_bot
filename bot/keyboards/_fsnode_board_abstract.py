@@ -42,7 +42,7 @@ class _FsNodeBaseBoard(_FsNodeAbstractBoard, ABC):
         self,
         fsnodes: list[FsNode],
         page: int = 0,
-        page_size: int = settings.tg.page_size,
+        page_size: int = settings.TG_PAGE_SIZE,
         **kwargs: Any,
     ) -> None:
         self.builder = InlineKeyboardBuilder()
@@ -72,10 +72,7 @@ class _FsNodeBaseBoard(_FsNodeAbstractBoard, ABC):
             prefix = MIME_SYMBOLS.get(fsnode.info.mimetype, "")
 
             builder.button(
-                text=(
-                    f"{prefix} {fsnode.name[:FSNODE_BUTTON_TEXT_LENGTH]}"
-                    f"{'/' if fsnode.is_dir else ''}"
-                ),
+                text=(f"{prefix} {fsnode.name[:FSNODE_BUTTON_TEXT_LENGTH]}{'/' if fsnode.is_dir else ''}"),
                 callback_data=self.fsnode_callback_data(
                     file_id=fsnode.file_id,
                     page=self.page,
@@ -92,8 +89,7 @@ class _FsNodeBaseBoard(_FsNodeAbstractBoard, ABC):
         """
         if not hasattr(self.actions, "PAG_BACK") or not hasattr(self.actions, "PAG_NEXT"):
             msg = (
-                "Pagination actions such as 'PAG_BACK' and 'PAG_NEXT' "
-                "must be defined in the CallbackData's actions."
+                "Pagination actions such as 'PAG_BACK' and 'PAG_NEXT' must be defined in the CallbackData's actions."
             )
             raise AttributeError(msg)
 

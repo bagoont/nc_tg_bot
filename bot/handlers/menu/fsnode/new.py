@@ -10,7 +10,7 @@ from aiogram_i18n import I18nContext, LazyProxy
 from nc_py_api import AsyncNextcloud
 
 from bot.core import settings
-from bot.handlers._core import get_fsnode_msg, get_human_readable_bytes
+from bot.handlers.core import get_fsnode_msg, get_human_readable_bytes
 from bot.keyboards import fsnode_new_board, menu_board, reply_board
 from bot.keyboards.callback_data_factories import FsNodeMenuData
 from bot.nextcloud import FsNodeService
@@ -111,12 +111,12 @@ async def upload(  # noqa: PLR0911
     if msg_doc.file_size is None or msg_doc.file_size == 0:
         return await message.answer(text=i18n.get("fsnode-empty"))
 
-    if msg_doc.file_size > settings.tg.max_upload_size:
+    if msg_doc.file_size > settings.nc.FILESIZE:
         return await message.answer(
             text=i18n.get(
                 "fsnode-size-limit",
                 size=get_human_readable_bytes(msg_doc.file_size),
-                size_limit=get_human_readable_bytes(settings.tg.max_upload_size),
+                size_limit=get_human_readable_bytes(settings.nc.FILESIZE),
             ),
         )
 
@@ -125,7 +125,7 @@ async def upload(  # noqa: PLR0911
         return await message.reply(text=i18n.get("fsnode-upload-error"))
 
     try:
-        buff = await bot.download_file(tg_file_obj.file_path, chunk_size=settings.nc.chunksize)
+        buff = await bot.download_file(tg_file_obj.file_path, chunk_size=settings.nc.CHUNKSIZE)
     except TelegramBadRequest:
         return await message.reply(text=i18n.get("fsnode-upload-error"))
 

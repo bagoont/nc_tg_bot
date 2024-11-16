@@ -78,7 +78,7 @@ class BaseFsNodeService:
         :return: The downloaded fsnode.
         """
         buff = io.BytesIO()
-        await self.nc.files.download2stream(self.fsnode, buff, chunk_size=settings.nc.chunksize)
+        await self.nc.files.download2stream(self.fsnode, buff, chunk_size=settings.nc.CHUNKSIZE)
 
         buff.seek(0)
         return BufferedInputFile(buff.read(), filename=self.fsnode.name)
@@ -100,7 +100,7 @@ class BaseFsNodeService:
         return await self.nc.files.upload_stream(
             f"{self.fsnode.user_path}{name}",
             buff,
-            chunk_size=settings.nc.chunksize,
+            chunk_size=settings.nc.CHUNKSIZE,
         )
 
 

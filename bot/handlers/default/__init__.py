@@ -1,4 +1,5 @@
 """Router with default messages."""
+
 from aiogram import Router
 from aiogram.filters.command import Command
 

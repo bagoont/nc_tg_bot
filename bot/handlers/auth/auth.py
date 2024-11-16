@@ -1,6 +1,7 @@
 """Authentication in Nextcloud handler."""
 
 from typing import cast
+from urllib.parse import urlparse
 
 from aiogram.types import Message
 from aiogram.types import User as TgUser
@@ -10,11 +11,25 @@ from nc_py_api import AsyncNextcloud, NextcloudException
 from bot.core import settings
 from bot.db import UnitOfWork
 from bot.db.models import User
-from bot.handlers._core import overwrite_url
 from bot.keyboards import menu_board
 
 AUTH_TIMEOUT = 60 * 20
 AUTH_TIMEOUT_IN_MIN = AUTH_TIMEOUT // 60
+
+
+def replace_with_base_url(url: str) -> str:
+    """Replce url for authentification with base url."""
+    parsed_url = urlparse(url)
+    parsed_base_url = urlparse(settings.nc.BASEURL)
+
+    netloc = parsed_base_url.hostname
+    if parsed_base_url.port:
+        netloc = f"{netloc}:{parsed_base_url.port}"
+
+    return parsed_url._replace(
+        scheme=parsed_base_url.scheme,
+        netloc=netloc,
+    ).geturl()
 
 
 async def auth(
@@ -39,10 +54,9 @@ async def auth(
     if await uow.users.get_by_id(msg_from_user.id):
         return await message.reply(text=i18n.get("already-authorized"), reply_markup=menu_board())
 
-    init = await nc.loginflow_v2.init(user_agent=settings.appname)
+    init = await nc.loginflow_v2.init(user_agent=settings.APP_NAME)
 
-    url = overwrite_url(init.login)
-
+    url = replace_with_base_url(init.login)
     if not url.startswith("https"):
         url = f"<code>{url}</code>"
     text = i18n.get("auth-init", url=url, timeout=AUTH_TIMEOUT_IN_MIN)
