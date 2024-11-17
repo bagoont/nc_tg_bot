@@ -6,9 +6,12 @@ configuration, webhook settings, Nextcloud server details, and Telegram bot cred
 """
 
 from typing import Self
+from pathlib import Path
 
 from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+BASE_DIR = Path(__file__)
 
 SQLITE_URL = "sqlite+aiosqlite:///./database.db"
 
@@ -141,6 +144,9 @@ class Settings(BaseSettings):
     TG_DROP_PENDING_UPDATES: bool = True
     TG_API_SERVER: str | None = None
     TG_LOCAL_MODE: bool = False
+
+    PRIVATE_KEY_PATH: Path = BASE_DIR.parent / "secrets" / "private.pem"
+    PUBLIC_KEY_PATH: Path = BASE_DIR.parent / "secrets" / "public.pem"
 
     nc: Nextcloud
     db: Database | None = None

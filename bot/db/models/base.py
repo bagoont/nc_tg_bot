@@ -1,8 +1,13 @@
 """Base model class for SQLAlchemy ORM."""
 
+from typing import Annotated
 from datetime import datetime
+import uuid
 
+from sqlalchemy import UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+
+uuid_pk = Annotated[uuid.UUID, mapped_column(UUID, primary_key=True, default=uuid.uuid4)]
 
 
 class Base(DeclarativeBase):

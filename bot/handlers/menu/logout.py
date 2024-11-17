@@ -6,9 +6,10 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message, ReplyKeyboardRemove
 from aiogram_i18n import I18nContext
 from nc_py_api import AsyncNextcloud
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from bot.db import UnitOfWork
 from bot.keyboards import logout_board
+from bot.db.crud import get_user_by_tg_id, delete_user
 
 
 async def logout(message: Message, i18n: I18nContext) -> Message:
@@ -25,7 +26,7 @@ async def logout_confirm(
     state: FSMContext,
     i18n: I18nContext,
     nc: AsyncNextcloud,
-    uow: UnitOfWork,
+    db: AsyncSession,
 ) -> Message:
     """Log out the user from Nextcloud.
 
@@ -38,8 +39,9 @@ async def logout_confirm(
     query_msg = cast(Message, query.message)
 
     await nc.ocs("DELETE", "/ocs/v2.php/core/apppassword")
-    await uow.users.delete(query.from_user.id)
-    await uow.commit()
+
+    user = await get_user_by_tg_id(db, query.from_user.id)
+    await delete_user(db, user.id)
 
     await state.clear()
 

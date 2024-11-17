@@ -1,10 +1,12 @@
 """Authorization filter."""
 
 from aiogram.filters import BaseFilter
-from aiogram.types import Message, TelegramObject
+from aiogram.types import TelegramObject
 from aiogram_i18n import I18nContext
 
-from bot.db import UnitOfWork
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from bot.db.crud import get_user_by_tg_id
 
 
 class AuthorizedFilter(BaseFilter):
@@ -15,15 +17,9 @@ class AuthorizedFilter(BaseFilter):
     execution of the command.
     """
 
-    async def __call__(self, event: TelegramObject, uow: UnitOfWork, i18n: I18nContext) -> bool:
+    async def __call__(self, event: TelegramObject, db: AsyncSession, i18n: I18nContext) -> bool:
         """Check if the user is authorized."""
-        if not isinstance(event, Message):
-            msg = "'AuthorizedFilter' is only usable with 'Message' event type."
-            raise TypeError(msg)
-        if event.from_user is None:
-            msg = "Event object must have the 'from_user' attribute."
-            raise AttributeError(msg)
-        if await uow.users.get_by_id(event.from_user.id):
+        if await get_user_by_tg_id(db, event.from_user.id):
             return True
         await event.answer(text=i18n.get("not-authorized"))
         return False

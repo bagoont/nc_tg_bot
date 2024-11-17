@@ -1,17 +1,15 @@
 """Authentication in Nextcloud handler."""
 
-from typing import cast
 from urllib.parse import urlparse
 
 from aiogram.types import Message
-from aiogram.types import User as TgUser
 from aiogram_i18n import I18nContext
 from nc_py_api import AsyncNextcloud, NextcloudException
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from bot.core import settings
-from bot.db import UnitOfWork
-from bot.db.models import User
 from bot.keyboards import menu_board
+from bot.db.crud import get_user_by_tg_id, create_user
 
 AUTH_TIMEOUT = 60 * 20
 AUTH_TIMEOUT_IN_MIN = AUTH_TIMEOUT // 60
@@ -32,26 +30,17 @@ def replace_with_base_url(url: str) -> str:
     ).geturl()
 
 
-async def auth(
-    message: Message,
-    i18n: I18nContext,
-    nc: AsyncNextcloud,
-    uow: UnitOfWork,
-) -> Message | bool:
+async def auth(message: Message, i18n: I18nContext, nc: AsyncNextcloud, db: AsyncSession) -> Message | bool:
     """Authenticate a user in Nextcloud.
 
     Initialize the login flow, polling for credentials, and add user to the database.
 
     :param message: Message object.
-    :param msg_from_user: User who sent the message.
-    :param bot: Bot object.
     :param i18n: Internationalization context.
     :param nc: Nextcloud API client.
-    :param uow: Unit of work.
+    :param db: Database session.
     """
-    msg_from_user = cast(TgUser, message.from_user)
-
-    if await uow.users.get_by_id(msg_from_user.id):
+    if await get_user_by_tg_id(db, message.from_user.id):
         return await message.reply(text=i18n.get("already-authorized"), reply_markup=menu_board())
 
     init = await nc.loginflow_v2.init(user_agent=settings.APP_NAME)
@@ -67,16 +56,13 @@ async def auth(
     except NextcloudException:
         return await init_message.edit_text(text=i18n.get("auth-timeout"))
 
-    user = User(
-        id=msg_from_user.id,
-        nc_login=credentials.login_name,
-        nc_app_password=credentials.app_password,
-        name=msg_from_user.username,
-        first_name=msg_from_user.first_name,
-        last_name=msg_from_user.last_name,
+    user = await create_user(
+        db,
+        tg_id=message.from_user.id,
+        tg_name=message.from_user.username,
+        login=credentials.login_name,
+        app_password=credentials.app_password,
     )
-    await uow.users.add(user)
-    await uow.commit()
 
     await init_message.edit_text(text=i18n.get("auth-success"))
 

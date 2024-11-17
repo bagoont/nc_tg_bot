@@ -1,9 +1,6 @@
 """Database-related functionalities."""
 
-from .database import session_maker
-from .uow import UnitOfWork
+from .db import session_maker
+from .models import User
 
-__all__ = (
-    "session_maker",
-    "UnitOfWork",
-)
+__all__ = ("session_maker", "User")
