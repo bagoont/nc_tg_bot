@@ -1,16 +1,15 @@
 """Async Nextcloud client middleware."""
 
 from collections.abc import Awaitable, Callable
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
 from nc_py_api import AsyncNextcloud
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from bot.core import settings
-
-if TYPE_CHECKING:
-    from bot.db import UnitOfWork
+from bot.db.crud import get_user_by_tg_id
 
 
 class NextcloudMD(BaseMiddleware):
@@ -30,18 +29,15 @@ class NextcloudMD(BaseMiddleware):
         data: dict[str, Any],
     ) -> Any:
         """Calls the handler function with the injected Nextcloud instance."""
-        uow: UnitOfWork | None = data.get("uow")
-        if uow is None:
-            msg = "'UnitOfWork' object not found."
+        db: AsyncSession | None = data.get("db")
+        if db is None:
+            msg = "'AsyncSession' object not found."
             raise ValueError(msg)
-        if not hasattr(event, "from_user"):
-            msg = "Telegram event object must have 'from_user' attribute."
-            raise AttributeError(msg)
-        user = await uow.users.get_by_id(event.from_user.id)
+        user = await get_user_by_tg_id(db, event.from_user.id)
         url = f"{settings.nc.SCHEME}://{settings.nc.HOST}:{settings.nc.PORT}"
         data["nc"] = AsyncNextcloud(
             nextcloud_url=url,
-            nc_auth_user=user.nc_login if user else None,
-            nc_auth_pass=user.nc_app_password if user else None,
+            nc_auth_user=user.login if user else None,
+            nc_auth_pass=user.app_password if user else None,
         )
         return await handler(event, data)

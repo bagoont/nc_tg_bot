@@ -2,9 +2,10 @@
 
 from aiogram import html
 from aiogram.utils.link import create_tg_link
+from sqlalchemy import BigInteger
 from sqlalchemy.orm import Mapped, mapped_column
 
-from bot.db.models import Base
+from bot.db.models import Base, uuid_pk
 
 
 class User(Base):
@@ -20,12 +21,11 @@ class User(Base):
 
     __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(primary_key=True, nullable=False)
-    nc_login: Mapped[str] = mapped_column(nullable=False)
-    nc_app_password: Mapped[str] = mapped_column(nullable=False)
-    name: Mapped[str] = mapped_column(nullable=True)
-    first_name: Mapped[str] = mapped_column(nullable=True)
-    last_name: Mapped[str] = mapped_column(nullable=True)
+    id: Mapped[uuid_pk]
+    tg_id: Mapped[BigInteger] = mapped_column(nullable=False, unique=True)
+    tg_name: Mapped[str] = mapped_column(nullable=True)
+    login: Mapped[str] = mapped_column(nullable=False, unique=True)
+    app_password: Mapped[str] = mapped_column(nullable=False)
 
     @property
     def url(self) -> str:
@@ -35,4 +35,4 @@ class User(Base):
     @property
     def mention(self) -> str:
         """Generates a mention string for the user, suitable for use in chat messages."""
-        return html.link(value=self.name, link=self.url)
+        return html.link(value=self.tg_name, link=self.url)
