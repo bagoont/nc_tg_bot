@@ -4,7 +4,7 @@ from aiogram_dialog.widgets.input import MessageInput
 from aiogram_dialog.widgets.kbd import Cancel
 from aiogram_dialog.widgets.text import Const
 
-from bot.handlers.search import handlers, keybaords
+from bot.handlers.search import getters, handlers, keybaords
 from bot.states import Search
 
 
@@ -28,6 +28,7 @@ def search_result_window() -> Window:
         Const("Search result"),
         keybaords.sg_search_result(handlers.on_file),
         state=Search.SCROLLGROUP,
+        getter=getters.get_fsnodes,
     )
 
 

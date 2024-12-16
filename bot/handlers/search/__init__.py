@@ -2,8 +2,7 @@ from aiogram import Router, filters, types
 from aiogram_dialog import Dialog, DialogManager
 from nc_py_api import AsyncNextcloud
 
-from . import windows
-from . import utils
+from . import utils, windows
 from bot.db import session_maker
 from bot.filters import AuthFilter
 from bot.middlewares import DatabaseMD, NextcloudMD
@@ -40,8 +39,8 @@ async def on_start(data: dict, dialog_manager: DialogManager) -> None:
             case {"query": query}:
                 await utils.search_fsnodes(dialog_manager, nc, ["like", "name", f"%{query}%"])
             case _:
-                # TODO: Write error.
-                raise ValueError
+                msg = "Invalid start data. Please provide 'query'."
+                raise ValueError(msg)
 
 
 dialog = Dialog(

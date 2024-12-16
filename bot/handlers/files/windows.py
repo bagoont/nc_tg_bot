@@ -11,37 +11,37 @@ from bot.states import Files
 
 def scrollgroup_window() -> Window:
     return Window(
-        Const("Choose file."),
+        Const("Select file."),
         keyboards.sg_files(handlers.on_file),
         Button(
-            Const("⬅️ Back"),
+            Const("⏪️ Go back"),
             id="files_back",
             on_click=handlers.on_back,
-            when=~F["dialog_data"]["fsnode"].user_path,
+            when=F["dialog_data"]["fsnode"].user_path,
         ),
         Button(
             Const("⬇️ Download"),
             id="files_download",
             on_click=handlers.on_download,
-            when=~F["dialog_data"]["fsnode"].is_dir & F["dialog_data"]["fsnode"].is_readable,
+            when=(~F["dialog_data"]["fsnode"].is_dir) & (F["dialog_data"]["fsnode"].is_readable),
         ),
         SwitchTo(
             Const("🆕 Add"),
             id="files_add",
             state=Files.NEW,
-            when=~F["dialog_data"]["fsnode"].is_dir & F["dialog_data"]["fsnode"].is_updatable,
+            when=(F["dialog_data"]["fsnode"].is_dir) & (F["dialog_data"]["fsnode"].is_updatable),
         ),
         SwitchTo(
             Const("⬇️ Select to downloads"),
             id="files_multidownload",
             state=Files.MULTIDOWNLOAD,
-            when=F["dialog_data"]["fsnode"].is_dir & F["dialog_data"]["fsnode"].is_readable,
+            when=(F["dialog_data"]["fsnode"].is_dir) & (F["dialog_data"]["fsnode"].is_readable),
         ),
         Button(
             Const("❌ Delete"),
             id="files_multidelete",
             on_click=handlers.on_delete,
-            when=~F["dialog_data"]["fsnode"].user_path != "",
+            when=~F["dialog_data"]["fsnode"].user_path,
         ),
         SwitchTo(
             Const("❌ Select to delete"),
