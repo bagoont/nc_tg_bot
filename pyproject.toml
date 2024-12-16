@@ -28,7 +28,7 @@ pydantic-settings = "^2.3.4"
 uvloop = "^0.21.0"
 nc-py-api = "^0.18.0"
 tenacity = "^9.0.0"
-aiogram-i18n = {extras = ["compiler"], version = "^1.4"}
+aiogram-i18n = { extras = [ "compiler" ], version = "^1.4" }
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.7.0"
@@ -42,14 +42,14 @@ extend-exclude = [
   "logs",
   "migrations",
 ]
-lint.select = ["ALL"]
+lint.select = [ "ALL" ]
 lint.extend-ignore = [
   "ARG001",
   "COM812",
-  "ISC001",
   "D203",
   "D211",
   "D213",
+  "ISC001",
 ]
 lint.isort.known-local-folder = [ "bot" ]
 lint.pylint.max-args = 7
