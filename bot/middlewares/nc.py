@@ -6,10 +6,9 @@ from typing import Any
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
 from nc_py_api import AsyncNextcloud
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from bot.core import settings
-from bot.db.crud import get_user_by_tg_id
+from bot.db import UserRepository
 
 
 class NextcloudMD(BaseMiddleware):
@@ -29,11 +28,12 @@ class NextcloudMD(BaseMiddleware):
         data: dict[str, Any],
     ) -> Any:
         """Calls the handler function with the injected Nextcloud instance."""
-        db: AsyncSession | None = data.get("db")
-        if db is None:
+        users: UserRepository | None = data.get("users")
+        if users is None:
             msg = "'AsyncSession' object not found."
             raise ValueError(msg)
-        user = await get_user_by_tg_id(db, event.from_user.id)
+
+        user = await users.get_by_tg_id(event.from_user.id)
         url = f"{settings.nc.SCHEME}://{settings.nc.HOST}:{settings.nc.PORT}"
         data["nc"] = AsyncNextcloud(
             nextcloud_url=url,

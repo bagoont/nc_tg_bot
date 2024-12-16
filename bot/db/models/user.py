@@ -2,7 +2,7 @@
 
 from aiogram import html
 from aiogram.utils.link import create_tg_link
-from sqlalchemy import BigInteger
+from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from bot.db.models import Base, uuid_pk
@@ -22,7 +22,8 @@ class User(Base):
     __tablename__ = "users"
 
     id: Mapped[uuid_pk]
-    tg_id: Mapped[BigInteger] = mapped_column(nullable=False, unique=True)
+    language: Mapped[str] = mapped_column(String(3))
+    tg_id: Mapped[int] = mapped_column(nullable=False, unique=True)
     tg_name: Mapped[str] = mapped_column(nullable=True)
     login: Mapped[str] = mapped_column(nullable=False, unique=True)
     app_password: Mapped[str] = mapped_column(nullable=False)

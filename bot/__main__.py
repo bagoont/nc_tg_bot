@@ -10,11 +10,10 @@ from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixe
 from bot.core import bot, dp, on_shutdown, on_startup, settings, webhook_run
 from bot.db import session_maker
 
-
 MAX_TRIES = 6
 WAIT_SECONDS = 5
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("aiogram.dispatcher")
 
 
 @retry(
@@ -28,6 +27,17 @@ async def check_db_connection() -> None:
         return
     async with session_maker() as session:
         await session.execute(select(1))
+
+
+@retry(
+    stop=stop_after_attempt(MAX_TRIES),
+    wait=wait_fixed(WAIT_SECONDS),
+    before=before_log(logger, logging.INFO),
+    after=after_log(logger, logging.WARNING),
+)
+async def check_nc_connection() -> None:
+    # TODO: Write function.
+    ...
 
 
 @retry(
@@ -55,6 +65,7 @@ async def main() -> None:
     This function initializes the bot, registers event handlers,
     and starts the polling process or webhook, depending on the configuration settings.
     """
+    await check_nc_connection()
     if settings.db:
         await check_db_connection()
     if settings.redis:
@@ -77,6 +88,6 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.getLevelName(settings.LOGGING_LEVEL))
+    logging.basicConfig(level=logging.getLevelName(settings.LOG_LEVEL))
 
     uvloop.run(main())

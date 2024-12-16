@@ -1,7 +1,5 @@
 from aiogram.fsm.state import State, StatesGroup
 
 
-class Search(StatesGroup):
-    INPUT_QUERY = State()
+class Trashbin(StatesGroup):
     SCROLLGROUP = State()
-    NOT_FOUND = State()

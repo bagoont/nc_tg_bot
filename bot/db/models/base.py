@@ -1,8 +1,8 @@
 """Base model class for SQLAlchemy ORM."""
 
-from typing import Annotated
-from datetime import datetime
 import uuid
+from datetime import datetime
+from typing import Annotated
 
 from sqlalchemy import UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column

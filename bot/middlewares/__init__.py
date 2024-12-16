@@ -1,11 +1,6 @@
 """Middlewares."""
 
-from .i18n import LocaleManager
-from .nc import NextcloudMD
 from .db import DatabaseMD
+from .nc import NextcloudMD
 
-__all__ = (
-    "DatabaseMD",
-    "NextcloudMD",
-    "LocaleManager",
-)
+__all__ = ("DatabaseMD", "NextcloudMD")

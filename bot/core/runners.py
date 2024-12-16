@@ -4,15 +4,15 @@ import asyncio
 
 from aiogram import Bot, Dispatcher, loggers
 from aiogram.enums import MenuButtonType
-from aiogram.types import BotCommand, MenuButtonWebApp, WebAppInfo
+from aiogram.types import MenuButtonWebApp, WebAppInfo
+from aiogram.utils.chat_action import ChatActionMiddleware
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
-from aiogram_i18n import I18nMiddleware
-from aiogram_i18n.cores.fluent_runtime_core import FluentRuntimeCore
+from aiogram_dialog import setup_dialogs
 from aiohttp.web import Application, AppRunner, TCPSite
 
-from bot.core.config import settings
+from bot.core import settings
 from bot.handlers import routers
-from bot.middlewares import LocaleManager, QueryMsgMD
+from bot.utils import Commands
 
 
 async def set_menu_button(bot: Bot) -> None:
@@ -33,13 +33,7 @@ async def set_bot_menu(bot: Bot) -> None:
     """Set avliable commands in Telegram."""
     await set_menu_button(bot)
 
-    commands = [
-        BotCommand(command="help", description="Get message with help text"),
-        BotCommand(command="auth", description="Start authentification in Nextcloud"),
-        BotCommand(command="logout", description="Logout from Nextcloud"),
-    ]
-
-    await bot.set_my_commands(commands)
+    await bot.set_my_commands([command.value for command in Commands])
 
 
 async def on_startup(dispatcher: Dispatcher, bot: Bot) -> None:
@@ -52,16 +46,12 @@ async def on_startup(dispatcher: Dispatcher, bot: Bot) -> None:
 
     await set_bot_menu(bot)
 
+    setup_dialogs(dispatcher)
+
     for router in routers:
-        dispatcher.include_router(router())
+        dispatcher.include_router(router)
 
-    i18n_middleware = I18nMiddleware(
-        core=FluentRuntimeCore(path="./bot/locales/{locale}/"),
-        manager=LocaleManager(),
-    )
-    i18n_middleware.setup(dispatcher=dispatcher)
-    dispatcher.callback_query.middleware.register(QueryMsgMD())
-
+    dispatcher.message.middleware(ChatActionMiddleware())
     loggers.dispatcher.info("Bot started.")
 
 

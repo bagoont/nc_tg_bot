@@ -1,17 +1,3 @@
-"""Routers and handlers."""
+from . import auth, common, files, search, settings, trashbin
 
-from .auth import auth_router
-from .default import default_router
-from .menu import menu_router
-
-__all__ = (
-    "default_router",
-    "auth_router",
-    "menu_router",
-)
-
-routers = (
-    default_router,
-    auth_router,
-    menu_router,
-)
+routers = (common.router, auth.router, files.router, search.router, trashbin.router, settings.router)

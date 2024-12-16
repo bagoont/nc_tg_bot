@@ -17,63 +17,72 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-aiogram = "^3.8.0"
-redis = "^5.0.7"
+aiogram = "^3.15.0"
+aiogram-dialog = "^2.2.0"
+redis = "^5.2.1"
 sqlalchemy = "^2.0.31"
-pydantic-settings = "^2.3.4"
 alembic = "^1.13.2"
 asyncpg = "^0.30.0"
-uvloop = "^0.21.0"
-aiogram-i18n = "^1.4"
-fluent-runtime = "^0.4.0"
-nc-py-api = "^0.18.0"
 aiosqlite = "^0.20.0"
+pydantic-settings = "^2.3.4"
+uvloop = "^0.21.0"
+nc-py-api = "^0.18.0"
+tenacity = "^9.0.0"
+aiogram-i18n = {extras = ["compiler"], version = "^1.4"}
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.7.0"
-pyright = "^1.1.389"
+mypy = "^1.13.0"
 pre-commit = "^4.0.0"
 
 [tool.ruff]
-target-version = "py312"
+target-version = "py310"
 line-length = 120
 extend-exclude = [
   "logs",
   "migrations",
 ]
-lint.select = [
-  "A",
-  "B",
-  "C",
-  "D",
-  "E",
-  "F",
-  "G",
-  "I",
-  "PIE",
-  "Q",
-  "RET",
-  "RUF",
-  "S",
-  "SIM",
-  "UP",
-  "W",
-]
+lint.select = ["ALL"]
 lint.extend-ignore = [
-  "D101",
-  "D105",
-  "D107",
+  "ARG001",
+  "COM812",
+  "ISC001",
   "D203",
+  "D211",
   "D213",
-  "D401",
-  "I001",
-  "RUF100",
 ]
-
 lint.isort.known-local-folder = [ "bot" ]
 lint.pylint.max-args = 7
 
-[tool.pyright]
-reportUnnecessaryTypeIgnoreComment = "warning"
-venvPath = "."
-venv = "venv"
+[tool.mypy]
+python_version = "3.10"
+show_error_codes = true
+show_error_context = true
+pretty = true
+ignore_missing_imports = false
+warn_unused_configs = true
+disallow_subclassing_any = true
+disallow_any_generics = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_return_any = true
+follow_imports_for_stubs = true
+namespace_packages = true
+show_absolute_path = true
+plugins = [
+  "pydantic.mypy",
+  "sqlalchemy.ext.mypy.plugin",
+]
+
+[[tool.mypy.overrides]]
+module = [
+  "asyncpg.*",
+  "nc_py_api.*",
+]
+ignore_missing_imports = true

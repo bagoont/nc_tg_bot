@@ -1,10 +1,11 @@
 from collections.abc import Awaitable, Callable
 from typing import Any
 
-from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
-
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+
+from bot.db import UserRepository
 
 
 class DatabaseMD(BaseMiddleware):
@@ -19,4 +20,5 @@ class DatabaseMD(BaseMiddleware):
     ) -> Any:
         async with self.session() as session:
             data["session"] = session
+            data["users"] = UserRepository(session)
             return await handler(event, data)

@@ -1,6 +1,7 @@
-"""States groups."""
+from .files import Files
+from .menu import Menu
+from .search import Search
+from .settings import Settings
+from .trashbin import Trashbin
 
-from .fsnode_menu import FsNodeMenuStatesGroup
-from .search import SearchStatesGroup
-
-__all__ = ("FsNodeMenuStatesGroup", "SearchStatesGroup")
+__all__ = ("Menu", "Files", "Settings", "Search", "Trashbin")

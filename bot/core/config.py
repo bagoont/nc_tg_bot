@@ -5,8 +5,8 @@ of the Nextcloud Telegram Bot. These settings include database connection detail
 configuration, webhook settings, Nextcloud server details, and Telegram bot credentials.
 """
 
-from typing import Self
 from pathlib import Path
+from typing import Self
 
 from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -136,11 +136,12 @@ class Settings(BaseSettings):
         env_nested_delimiter="_",
     )
     APP_NAME: str = "Nextcloud Telegram Bot"
-    LOGGING_LEVEL: str = "INFO"
+    LOG_LEVEL: str = "INFO"
 
     TG_TOKEN: str
-    TG_PAGE_SIZE: int = 8
+    TG_SCROLLING_HEIGHT: int = 8
     TG_UPLOAD_SIZE: int = MAX_TG_BOT_FILE_SIZE
+    TG_CHUNK_SIZE: int = MIN_CHUNK_SIZE
     TG_DROP_PENDING_UPDATES: bool = True
     TG_API_SERVER: str | None = None
     TG_LOCAL_MODE: bool = False
@@ -152,6 +153,15 @@ class Settings(BaseSettings):
     db: Database | None = None
     redis: Redis | None = None
     webhook: Webhook | None = None
+
+    @field_validator("TG_CHUNK_SIZE")
+    @classmethod
+    def validate_chunksize(cls, v: int) -> int:
+        """Validates the chunk size against minimum and maximum limits."""
+        if MIN_CHUNK_SIZE > v > MAX_TG_BOT_FILE_SIZE:
+            msg = f"The size of chunks must be between {MIN_CHUNK_SIZE} and {MAX_CHUNK_SIZE}."
+            raise ValueError(msg)
+        return v
 
     @model_validator(mode="after")
     def validate_local_mode(self) -> Self:
