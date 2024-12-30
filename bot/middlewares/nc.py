@@ -12,22 +12,12 @@ from bot.db import UserRepository
 
 
 class NextcloudMD(BaseMiddleware):
-    """Middleware for Nextcloud.
-
-    Injects :class:`AsyncNextcloud` instance into the handler context.
-
-    :param handler: The handler function to be executed.
-    :param event: The event object.
-    :param data: The data dictionary containing the request context.
-    """
-
     async def __call__(
         self,
         handler: Callable[[TelegramObject, dict[str, Any]], Awaitable[Any]],
         event: TelegramObject,
         data: dict[str, Any],
     ) -> Any:
-        """Calls the handler function with the injected Nextcloud instance."""
         users: UserRepository | None = data.get("users")
         if users is None:
             msg = "'AsyncSession' object not found."

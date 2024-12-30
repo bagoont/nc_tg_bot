@@ -1,3 +1,7 @@
-from . import auth, common, files, search, settings, trashbin
+from bot.core import settings
+from bot.handlers import auth, errors
 
-routers = (common.router, auth.router, files.router, search.router, trashbin.router, settings.router)
+routers = [auth.router]
+
+if not settings.DEBUG:
+    routers.append(errors.router)

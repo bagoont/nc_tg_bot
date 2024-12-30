@@ -15,6 +15,9 @@ class AuthFilter(filters.BaseFilter):
 
     async def __call__(self, event: types.Message, users: UserRepository) -> bool:
         """Check if the user is authorized."""
+        if event.from_user is None:
+            raise ValueError
+
         if await users.get_by_tg_id(event.from_user.id):
             return True
         await event.answer("PROHIBIT")

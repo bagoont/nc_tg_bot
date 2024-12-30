@@ -1,6 +1,7 @@
-"""Middlewares."""
+from bot.middlewares.db import DatabaseMD
+from bot.middlewares.nc import NextcloudMD
 
-from .db import DatabaseMD
-from .nc import NextcloudMD
-
-__all__ = ("DatabaseMD", "NextcloudMD")
+__all__ = (
+    "DatabaseMD",
+    "NextcloudMD",
+)

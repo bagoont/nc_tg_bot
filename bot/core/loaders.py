@@ -4,8 +4,8 @@ Build dispatcher and bot instance for the Nextcloud Telegram Bot, configuringthe
 storage backend and integrating with the Telegram API.
 """
 
-from collections.abc import Callable
-from typing import Any, cast
+import json
+from typing import Any
 
 from aiogram import Bot, Dispatcher, loggers
 from aiogram.client.default import DefaultBotProperties
@@ -13,11 +13,11 @@ from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.client.telegram import TelegramAPIServer
 from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.fsm.storage.redis import RedisStorage
+from aiogram.fsm.storage.redis import DefaultKeyBuilder, RedisStorage
 from redis.asyncio import Redis
 
-from bot.core.config import settings
-from bot.db import session_maker
+from bot.core import settings
+from bot.utils import as_obj, default
 
 session = None
 if settings.TG_API_SERVER:
@@ -34,8 +34,16 @@ bot = Bot(
     session=session,
 )
 
-_storage = (
-    RedisStorage(
+
+if settings.redis:
+
+    def _json_dumps(obj: Any) -> str:
+        return json.dumps(obj, default=default)
+
+    def _json_loads(obj: Any) -> Any:
+        return json.loads(obj, object_hook=as_obj)
+
+    _storage = RedisStorage(
         redis=Redis(
             db=settings.redis.DB,
             host=settings.redis.HOSTNAME,
@@ -43,9 +51,12 @@ _storage = (
             username=settings.redis.USERNAME,
             port=settings.redis.PORT,
         ),
+        key_builder=DefaultKeyBuilder(with_destiny=True),
+        json_dumps=_json_dumps,
+        json_loads=_json_loads,
     )
-    if settings.redis
-    else MemoryStorage()
-)
+else:
+    _storage = MemoryStorage()
 
-dp = Dispatcher(storage=_storage, _session_maker=cast(Callable[[], Any], session_maker))
+
+dp = Dispatcher(storage=_storage)

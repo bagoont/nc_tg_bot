@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 
-from bot.core.config import settings, SQLITE_URL
+from bot.core import settings, SQLITE_URL
 from bot.db.models import Base
 
 # this is the Alembic Config object, which provides

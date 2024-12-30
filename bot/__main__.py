@@ -1,8 +1,7 @@
-"""Launching bot."""
-
 import logging
 
 import uvloop
+from nc_py_api import AsyncNextcloud
 from redis.asyncio import Redis
 from sqlalchemy import select
 from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixed
@@ -34,10 +33,10 @@ async def check_db_connection() -> None:
     wait=wait_fixed(WAIT_SECONDS),
     before=before_log(logger, logging.INFO),
     after=after_log(logger, logging.WARNING),
+    reraise=True,
 )
-async def check_nc_connection() -> None:
-    # TODO: Write function.
-    ...
+async def check_nc_capabilities(nc: AsyncNextcloud) -> None:
+    await nc.capabilities
 
 
 @retry(
@@ -65,7 +64,8 @@ async def main() -> None:
     This function initializes the bot, registers event handlers,
     and starts the polling process or webhook, depending on the configuration settings.
     """
-    await check_nc_connection()
+    nc = AsyncNextcloud(nextcloud_url=f"{settings.nc.SCHEME}://{settings.nc.HOST}:{settings.nc.PORT}")
+    await check_nc_capabilities(nc)
     if settings.db:
         await check_db_connection()
     if settings.redis:

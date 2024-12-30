@@ -1,5 +1,5 @@
-from .base import Repository
-from .users import UserRepository
+from bot.db.repositories.base import Repository
+from bot.db.repositories.users import UserRepository
 
 __all__ = (
     "Repository",

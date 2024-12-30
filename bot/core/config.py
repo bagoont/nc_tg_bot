@@ -6,16 +6,16 @@ configuration, webhook settings, Nextcloud server details, and Telegram bot cred
 """
 
 from pathlib import Path
-from typing import Self
 
 from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing_extensions import Self
 
 BASE_DIR = Path(__file__)
 
 SQLITE_URL = "sqlite+aiosqlite:///./database.db"
 
-MAX_TG_BOT_FILE_SIZE = 50 * 2**20
+MAX_TG_FILESIZE = 50 * 2**20
 MIN_CHUNK_SIZE = 5 * 2**20
 MAX_CHUNK_SIZE = 2**31
 
@@ -57,6 +57,7 @@ class Nextcloud(BaseSettings):
     FILESIZE: int = 5 * 2**30
     CHUNKSIZE: int = MIN_CHUNK_SIZE
     BASEURL: str = ""
+    AUTH_TIMEOUT: int = 20 * 60  # TODO: Add validation. Must less than 20 min.
 
     @model_validator(mode="after")
     def validate_baseurl(self) -> Self:
@@ -108,46 +109,33 @@ class Redis(BaseSettings):
     :param REDIS_DB: Database number within Redis to connect to, defaults to 1.
     """
 
-    USERNAME: str
-    PASSWORD: str
-    DB: str
+    USERNAME: str | None = None
+    PASSWORD: str | None = None
+    DB: str | int = 0
     HOSTNAME: str
     PORT: int = 6379
 
 
 class Settings(BaseSettings):
-    """Configuration in a single object.
-
-    :param model_config: Configuration options for Pydantic settings.
-    :param APP_NAME: Name of the application, defaults to "Nextcloud Telegram Bot".
-    :param LOGGING_LEVEL: Logging level, defaults to "INFO".
-    :param TG_TOKEN: Token used to authenticate the bot with the Telegram API.
-    :param TG_PAGE_SIZE: Page size for pagination for Telegram API, defaults to 8.
-    :param TG_UPLOAD_SIZE: Maximum size of a file that can be uploaded, defaults to
-        MAX_TG_BOT_FILE_SIZE.
-    :param TG_DROP_PENDING_UPDATES: Whether to drop pending updates on bot restart, defaults to True.
-    :param TG_API_SERVER: The URL of the Telegram API server, defaults to None.
-    :param TG_LOCAL_MODE: Use local requests if True, defaults to False.
-    """
-
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
         env_nested_delimiter="_",
     )
+    DEBUG: bool = False
     APP_NAME: str = "Nextcloud Telegram Bot"
+    # TODO: Validate if DEFAULT_LANGUAGE in AVLAIABLE_LANGUAGE
+    DEFAULT_LANGUAGE: str = "en"
+    AVALIABLE_LANGUAGES: list[str] = ["en", "ru"]
     LOG_LEVEL: str = "INFO"
 
     TG_TOKEN: str
     TG_SCROLLING_HEIGHT: int = 8
-    TG_UPLOAD_SIZE: int = MAX_TG_BOT_FILE_SIZE
+    TG_FILESIZE: int = MAX_TG_FILESIZE
     TG_CHUNK_SIZE: int = MIN_CHUNK_SIZE
     TG_DROP_PENDING_UPDATES: bool = True
     TG_API_SERVER: str | None = None
     TG_LOCAL_MODE: bool = False
-
-    PRIVATE_KEY_PATH: Path = BASE_DIR.parent / "secrets" / "private.pem"
-    PUBLIC_KEY_PATH: Path = BASE_DIR.parent / "secrets" / "public.pem"
 
     nc: Nextcloud
     db: Database | None = None
@@ -158,7 +146,7 @@ class Settings(BaseSettings):
     @classmethod
     def validate_chunksize(cls, v: int) -> int:
         """Validates the chunk size against minimum and maximum limits."""
-        if MIN_CHUNK_SIZE > v > MAX_TG_BOT_FILE_SIZE:
+        if MIN_CHUNK_SIZE > v > MAX_TG_FILESIZE:
             msg = f"The size of chunks must be between {MIN_CHUNK_SIZE} and {MAX_CHUNK_SIZE}."
             raise ValueError(msg)
         return v

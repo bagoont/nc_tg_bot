@@ -1,0 +1,32 @@
+MIME_SYMBOLS = {
+    "text/plain": "📝",
+    "image/jpeg": "🖼️",
+    "application/pdf": "📄",
+    "video/mp4": "📹",
+    "audio/mpeg": "🎶",
+    "text/html": "🌐",
+    "application/x-rar": "📦",
+    "application/zip": "📦",
+    "image/png": "🖼️",
+    "image/gif": "🎞️",
+    "video/webm": "📹",
+    "audio/wav": "🎵",
+    "text/csv": "📊",
+    "application/vnd.ms-excel": "📊",
+    "application/msword": "📝",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "📄",
+    "application/vnd.ms-powerpoint": "📊",
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation": "📊",
+    "text/x-python": "🐍",
+    "image/svg+xml": "🖼️",
+    "video/ogg": "📹",
+    "audio/aac": "🎶",
+    "application/javascript": "💻",
+    "text/css": "🎨",
+    "application/json": "🗃️",
+}
+
+LANG_SYMBOLS = {
+    "en": {"symbol": "🇬🇧", "name": "English"},
+    "ru": {"symbol": "🇷🇺", "name": "Русский"},
+}

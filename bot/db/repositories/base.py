@@ -45,16 +45,6 @@ class Repository(Generic[T]):
         await self.session.flush()
         return entity
 
-    async def update(self, ident: UUID | T, **kwargs: Any) -> T:
-        entity = await self._get_obj(ident)
-        if entity is None:
-            msg = "Entity not found."
-            raise ValueError(msg)
-        for key, value in kwargs.items():
-            setattr(entity, key, value)
-        await self.session.flush()
-        return entity
-
     async def delete(self, ident: UUID | T) -> None:
         entity = await self._get_obj(ident)
         if entity is None:

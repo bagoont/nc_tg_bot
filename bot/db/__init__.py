@@ -1,7 +1,7 @@
 """Database-related functionalities."""
 
-from .db import session_maker
-from .models import User
-from .repositories import UserRepository
+from bot.db.db import session_maker
+from bot.db.models import User
+from bot.db.repositories import UserRepository
 
 __all__ = ("UserRepository", "session_maker", "User")

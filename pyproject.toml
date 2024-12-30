@@ -17,8 +17,8 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-aiogram = "^3.15.0"
-aiogram-dialog = "^2.2.0"
+aiogram = "^3.16.0"
+aiogram-dialog = "^2.3.0"
 redis = "^5.2.1"
 sqlalchemy = "^2.0.31"
 alembic = "^1.13.2"
@@ -28,11 +28,10 @@ pydantic-settings = "^2.3.4"
 uvloop = "^0.21.0"
 nc-py-api = "^0.18.0"
 tenacity = "^9.0.0"
-aiogram-i18n = { extras = [ "compiler" ], version = "^1.4" }
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.7.0"
-mypy = "^1.13.0"
+mypy = "^1.14.0"
 pre-commit = "^4.0.0"
 
 [tool.ruff]
@@ -44,12 +43,14 @@ extend-exclude = [
 ]
 lint.select = [ "ALL" ]
 lint.extend-ignore = [
+  "ANN401",
   "ARG001",
   "COM812",
   "D203",
   "D211",
   "D213",
   "ISC001",
+  "RUF006",
 ]
 lint.isort.known-local-folder = [ "bot" ]
 lint.pylint.max-args = 7

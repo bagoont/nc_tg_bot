@@ -1,9 +1,5 @@
 """Custom filters for handling incoming updates in bot."""
 
-from .auth import AuthFilter
-from .chat_type import ChatTypeFilter
+from bot.filters.auth import AuthFilter
 
-__all__ = (
-    "AuthFilter",
-    "ChatTypeFilter",
-)
+__all__ = ("AuthFilter",)
