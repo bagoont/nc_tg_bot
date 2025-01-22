@@ -9,10 +9,6 @@ from bot.dialogs.settings.states import Settings
 
 
 async def on_lang(callback: types.CallbackQuery, widget: Any, manager: DialogManager, item_id: str) -> None:
-    if manager.event.from_user is None:
-        # TODO: Write error message.
-        raise ValueError
-
     users: UserRepository = manager.middleware_data.get("users")
 
     user = await users.get_by_tg_id(manager.event.from_user.id)
@@ -28,10 +24,6 @@ async def on_lang(callback: types.CallbackQuery, widget: Any, manager: DialogMan
 
 
 async def on_logout(callback: types.CallbackQuery, widget: Any, manager: DialogManager) -> None:
-    if manager.event.from_user is None:
-        # TODO: Write error message.
-        raise ValueError
-
     nc: AsyncNextcloud = manager.middleware_data.get("nc")
     users: UserRepository = manager.middleware_data.get("users")
 

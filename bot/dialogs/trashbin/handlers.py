@@ -6,8 +6,6 @@ from nc_py_api import AsyncNextcloud, FsNode
 
 from bot.dialogs.trashbin.states import Trashbin
 
-DD_CHECKED_IDS_KEY = "checked_ids"
-
 
 async def on_start(data: dict[str, Any], dialog_manager: DialogManager) -> None:
     nc: AsyncNextcloud = dialog_manager.middleware_data.get("nc")
