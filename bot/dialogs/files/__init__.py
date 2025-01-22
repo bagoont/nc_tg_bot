@@ -27,22 +27,19 @@ async def files(
         await dialog_manager.start(Files.SCROLLGROUP, mode=StartMode.RESET_STACK)
 
 
-upload_documents_bg_dialog = Dialog(
-    windows.upload_documents(),
-    name="upload_documents",
-)
 multiselect_dialog = Dialog(
     windows.multiselect(),
     windows.multidownload(),
     windows.multidelete(),
-    on_start=handlers.on_multiselect_start,
+    on_start=handlers.on_subdialog_start,
     name="multiselect",
 )
 create_dialog = Dialog(
     windows.create(),
     windows.create_folder(),
     windows.proccess_documents(),
-    on_start=handlers.on_create_start,
+    windows.upload_documents(),
+    on_start=handlers.on_subdialog_start,
     name="create",
 )
 dialog = Dialog(
@@ -52,7 +49,6 @@ dialog = Dialog(
     name="files",
 )
 
-router.include_router(upload_documents_bg_dialog)
 router.include_router(dialog)
 router.include_router(multiselect_dialog)
 router.include_router(create_dialog)

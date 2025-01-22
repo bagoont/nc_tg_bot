@@ -5,7 +5,7 @@ from aiogram_dialog import DialogManager
 from nc_py_api import AsyncNextcloud
 
 from bot.db import UserRepository
-from bot.states import Settings
+from bot.dialogs.settings.states import Settings
 
 
 async def on_lang(callback: types.CallbackQuery, widget: Any, manager: DialogManager, item_id: str) -> None:

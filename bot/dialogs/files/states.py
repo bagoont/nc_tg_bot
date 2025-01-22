@@ -15,7 +15,4 @@ class Create(StatesGroup):
     TYPE = State()
     FOLDER = State()
     FILES = State()
-
-
-class UploadDocumentsBg(StatesGroup):
-    PROGRESS = State()
+    UPLOAD = State()

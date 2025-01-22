@@ -1,3 +1,3 @@
-from bot.dialogs import files, search, settings, trash_bin
+from bot.dialogs import files, search, settings, trashbin
 
-routers = (files.router, search.router, trash_bin.router, settings.router)
+routers = (files.router, search.router, trashbin.router, settings.router)

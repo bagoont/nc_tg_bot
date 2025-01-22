@@ -2,11 +2,9 @@ from aiogram import Router, filters, types
 from aiogram_dialog import Dialog, DialogManager
 from nc_py_api import AsyncNextcloud
 
-from bot.db import session_maker
 from bot.dialogs.settings import windows
+from bot.dialogs.settings.states import Settings
 from bot.filters import AuthFilter
-from bot.middlewares import DatabaseMD, NextcloudMD
-from bot.states import Settings
 from bot.utils import Commands
 
 router: Router = Router(name="files")

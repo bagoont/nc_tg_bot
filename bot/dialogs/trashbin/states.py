@@ -1,7 +1,7 @@
 from aiogram.fsm.state import State, StatesGroup
 
 
-class Trash_bin(StatesGroup):
+class Trashbin(StatesGroup):
     SCROLLGROUP = State()
     MULTISELECT = State()
     TRASH = State()

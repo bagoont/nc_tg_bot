@@ -3,7 +3,7 @@ from aiogram_dialog.widgets.kbd import Button, Cancel, Row, SwitchTo
 from aiogram_dialog.widgets.text import Const
 
 from bot.dialogs.settings import getters, handlers, keyboards
-from bot.states import Settings
+from bot.dialogs.settings.states import Settings
 
 
 def main_window() -> Window:

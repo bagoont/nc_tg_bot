@@ -54,7 +54,7 @@ class Nextcloud(BaseSettings):
     SCHEME: str = "https"
     HOST: str
     PORT: int = 443
-    FILESIZE: int = 5 * 2**30
+    FILESIZE: int = 5 * 2**40
     CHUNKSIZE: int = MIN_CHUNK_SIZE
     BASEURL: str = ""
     AUTH_TIMEOUT: int = 20 * 60  # TODO: Add validation. Must less than 20 min.

@@ -2,36 +2,36 @@ from aiogram import types
 from aiogram_dialog import Window
 from aiogram_dialog.widgets.input import MessageInput
 from aiogram_dialog.widgets.kbd import Cancel
-from aiogram_dialog.widgets.text import Const
+from aiogram_dialog.widgets.text import Const, Jinja
 
 from bot.dialogs.files import keyboards
 from bot.dialogs.search import getters, handlers
-from bot.states import Search
+from bot.dialogs.search.states import Search
 
 
-def input_window() -> Window:
+def input_query() -> Window:
     return Window(
-        Const("Write folder name."),
+        Jinja("{% for fsnode in fsnodes %}" "{{ fsnode.name }}"),
         MessageInput(
             handlers.search_query_handler,
             content_types=[types.ContentType.TEXT],
         ),
-        Cancel(Const("Cancel")),
+        Cancel(Const("__exit__")),
         state=Search.INPUT_QUERY,
     )
 
 
-def scrollgroup_window() -> Window:
+def scrollgroup() -> Window:
     return Window(
-        Const("Search result"),
+        Const("__search_result__"),
         keyboards.sg_fsnodes(handlers.on_file, items_key="fsnodes"),
         state=Search.SCROLLGROUP,
         getter=getters.get_fsnodes,
     )
 
 
-def not_found_window() -> Window:
+def not_found() -> Window:
     return Window(
-        Const("Not found."),
+        Const("__not_found__"),
         state=Search.NOT_FOUND,
     )

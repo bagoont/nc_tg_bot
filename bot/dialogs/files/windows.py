@@ -9,7 +9,7 @@ from aiogram_dialog.widgets.kbd import Button, Cancel, SwitchTo
 from aiogram_dialog.widgets.text import Const, Format, Multi, Progress
 
 from bot.dialogs.files import getters, handlers, keyboards
-from bot.dialogs.files.states import Create, Files, Multiselect, UploadDocumentsBg
+from bot.dialogs.files.states import Create, Files, Multiselect
 
 
 def _is_selected(data: dict[Any, Any], widget: Whenable, manager: DialogManager) -> bool:
@@ -174,6 +174,6 @@ def upload_documents() -> Window:
             Format("__uploading_files__"),
             Progress("progress"),
         ),
-        state=UploadDocumentsBg.PROGRESS,
+        state=Create.UPLOAD,
         getter=getters.get_progress,
     )

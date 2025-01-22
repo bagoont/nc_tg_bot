@@ -1,13 +1,12 @@
-from http import HTTPStatus
-from typing import Any
+from typing import Any, cast
 
 from aiogram import Router, filters, types
-from aiogram_dialog import Dialog, DialogManager
+from aiogram_dialog import Data, Dialog, DialogManager
 from nc_py_api import AsyncNextcloud, FsNode, NextcloudException
 
-from bot.dialogs.search import windows
+from bot.dialogs.search import handlers, windows
+from bot.dialogs.search.states import Search
 from bot.filters import AuthFilter
-from bot.states import Search
 from bot.utils import Commands
 
 router: Router = Router(name="search")
@@ -29,41 +28,11 @@ async def search(
     await dialog_manager.start(Search.INPUT_QUERY)
 
 
-async def process_start_data(data: dict[str, Any], nc: AsyncNextcloud) -> str | FsNode:
-    if data.get(SD_QUERY_KEY):
-        return data[SD_QUERY_KEY]
-    msg = "Invalid start data. Please provide either 'path' or 'file_id'."
-    raise ValueError(msg)
-
-
-async def on_start(data: dict[str, Any], dialog_manager: DialogManager) -> None:
-    if dialog_manager.start_data:
-        if not isinstance(dialog_manager.start_data, dict):
-            msg = "..."
-            raise TypeError(msg)
-
-        nc: AsyncNextcloud = dialog_manager.middleware_data.get(NEXTCLOUD_KEY)
-
-        try:
-            query = await process_start_data(dialog_manager.start_data, nc)
-            fsnodes = await nc.files.find(query, ["like", "name", f"%{query}%"])
-        except NextcloudException as e:
-            if e.status_code == HTTPStatus.NOT_FOUND:
-                await dialog_manager.switch_to(Search.NOT_FOUND)
-                return
-            if isinstance(dialog_manager.event, types.Message):
-                await dialog_manager.event.reply(e.reason)
-            if isinstance(dialog_manager.event, types.CallbackQuery):
-                await dialog_manager.event.answer(e.reason, show_alert=True)
-            await dialog_manager.done()
-            return
-
-
 dialog = Dialog(
-    windows.input_window(),
-    windows.scrollgroup_window(),
-    windows.not_found_window(),
-    on_start=on_start,
+    windows.input_query(),
+    windows.scrollgroup(),
+    windows.not_found(),
+    on_start=handlers.on_start,
     name="search",
 )
 
