@@ -1,4 +1,4 @@
-FROM python:3.12-alpine
+FROM python:3.14-alpine
 ENV PYTHONPATH "${PYTHONPATH}:/bot"
 ENV PATH "/bot/scripts:${PATH}"
 WORKDIR /bot
